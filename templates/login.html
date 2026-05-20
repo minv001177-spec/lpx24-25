@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Вход - Scootify{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 120px auto 60px; padding: 0 20px;">
+    <div style="background: white; padding: 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+        <h2 style="text-align: center; margin-bottom: 10px; color: #0066CC;">🔐 Вход в аккаунт</h2>
+        <p style="text-align: center; color: #666; margin-bottom: 30px;">Добро пожаловать назад!</p>
+        
+        <form method="POST" action="/login">
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Имя пользователя:</label>
+                <input type="text" name="username" required placeholder="Ваше имя пользователя">
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-lock"></i> Пароль:</label>
+                <input type="password" name="password" required placeholder="Ваш пароль">
+            </div>
+            <button type="submit" class="btn-submit">Войти</button>
+        </form>
+        
+        <p style="text-align: center; margin-top: 25px;">
+            <a href="/forgot_password" style="color: #0066CC;">Забыли пароль?</a>
+        </p>
+        <p style="text-align: center; margin-top: 15px;">
+            Нет аккаунта? <a href="/register" style="color: #0066CC;">Зарегистрироваться</a>
+        </p>
+    </div>
+</div>
+
+<style>
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #1E293B;
+}
+.form-group label i {
+    margin-right: 8px;
+    color: #0066CC;
+}
+.form-group input {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 15px;
+}
+.form-group input:focus {
+    outline: none;
+    border-color: #0066CC;
+    box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+}
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #0066CC, #00B3B3);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0,102,204,0.3);
+}
+</style>
+{% endblock %}

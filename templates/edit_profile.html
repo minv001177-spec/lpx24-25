@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Редактирование профиля - Scootify{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 100px auto 60px; padding: 0 20px;">
+    <div style="background: white; padding: 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+        <h2 style="text-align: center; margin-bottom: 30px; color: #0066CC;">✏️ Редактирование профиля</h2>
+        
+        <form method="POST" action="/edit_profile">
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Имя пользователя:</label>
+                <input type="text" name="username" value="{{ user.username }}" required>
+                <small style="color: #666;">Имя должно быть уникальным</small>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-envelope"></i> Email:</label>
+                <input type="email" name="email" value="{{ user.email }}" required>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-comment"></i> О себе:</label>
+                <textarea name="bio" rows="5" style="width: 100%; padding: 14px; border: 2px solid #e0e0e0; border-radius: 12px; font-family: inherit;">{{ user.bio or '' }}</textarea>
+                <small style="color: #666;">Расскажите немного о себе</small>
+            </div>
+            
+            <div class="form-group">
+                <label><i class="fas fa-key"></i> Новый пароль (оставьте пустым, если не хотите менять):</label>
+                <input type="password" name="new_password" placeholder="минимум 4 символа">
+            </div>
+            
+            <div style="display: flex; gap: 15px; margin-top: 30px;">
+                <button type="submit" class="btn-submit" style="flex: 1;">💾 Сохранить изменения</button>
+                <a href="/profile" class="btn-cancel" style="flex: 1; text-align: center; padding: 14px; background: #95a5a6; color: white; text-decoration: none; border-radius: 12px; font-weight: 600;">❌ Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #1E293B;
+}
+.form-group label i {
+    margin-right: 8px;
+    color: #0066CC;
+}
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 15px;
+    transition: all 0.3s;
+}
+.form-group input:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: #0066CC;
+    box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+}
+.btn-submit {
+    padding: 14px;
+    background: linear-gradient(135deg, #0066CC, #00B3B3);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0,102,204,0.3);
+}
+small {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+}
+</style>
+{% endblock %}

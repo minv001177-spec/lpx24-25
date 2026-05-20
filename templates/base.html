@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Scootify - Аренда самокатов в Казани{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        /* Глобальные стили для прижатия подвала */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html, body {
+            height: 100%;
+        }
+        
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: var(--gradient-dark);
+            line-height: 1.6;
+        }
+        
+        main {
+            flex: 1 0 auto;
+        }
+        
+        .footer {
+            flex-shrink: 0;
+            margin-top: 0;
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 60px 24px 40px;
+        }
+        
+        .flash-messages {
+            position: fixed;
+            top: 90px;
+            right: 20px;
+            z-index: 1100;
+            max-width: 350px;
+        }
+        .flash-message {
+            padding: 12px 20px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            font-size: 14px;
+            animation: slideIn 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .flash-success { background: #27ae60; color: white; }
+        .flash-error { background: #e74c3c; color: white; }
+        .flash-info { background: #3498db; color: white; }
+        .flash-warning { background: #f39c12; color: white; }
+        
+        /* Стили для страницы восстановления пароля */
+        .forgot-password-container {
+            max-width: 500px;
+            margin: 120px auto 60px;
+            padding: 0 20px;
+            width: 100%;
+        }
+        
+        .forgot-password-card {
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #1E293B;
+        }
+        .form-group label i {
+            margin-right: 8px;
+            color: #0066CC;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 15px;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #0066CC;
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #0066CC, #00B3B3);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0,102,204,0.3);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-container">
+            <a href="/" class="logo">
+                <div class="logo-icon"><i class="fas fa-bolt"></i></div>
+                <span class="logo-text">Scootify</span>
+            </a>
+            
+            <ul class="nav-menu">
+                <li><a href="/#tariffs">Тарифы</a></li>
+                <li><a href="/#map-section">Карта</a></li>
+                <li><a href="/#how-it-works">Как работает</a></li>
+                <li><a href="/#footer">Контакты</a></li>
+                <li><a href="/feedback">📝 Отзывы</a></li>
+                {% if session.user_id %}
+                <li><a href="/secret">🔐 Секрет</a></li>
+                <li><a href="/profile">👤 Профиль</a></li>
+                {% endif %}
+            </ul>
+            
+            <div class="header-actions">
+                {% if session.user_id %}
+                    <div class="user-info">
+                        <i class="fas fa-user-circle"></i>
+                        <span>{{ session.username }}</span>
+                    </div>
+                    <a href="/logout" class="btn btn-secondary">Выйти</a>
+                {% else %}
+                    <a href="/login" class="btn btn-secondary">Войти</a>
+                    <a href="/register" class="btn btn-primary">Регистрация</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="flash-message flash-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+    </div>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer" id="footer">
+        <div class="footer-container">
+            <div class="footer-col">
+                <div class="logo">
+                    <div class="logo-icon"><i class="fas fa-bolt"></i></div>
+                    <span class="logo-text">Scootify</span>
+                </div>
+                <p style="margin-top: 15px; color: rgba(255,255,255,0.7);">Аренда электросамокатов в Казани</p>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-vk"></i></a>
+                    <a href="#"><i class="fab fa-telegram"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="footer-col">
+                <h3>Компания</h3>
+                <ul class="footer-links">
+                    <li><a href="#">О нас</a></li>
+                    <li><a href="#">Вакансии</a></li>
+                    <li><a href="#">Партнёрам</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Помощь</h3>
+                <ul class="footer-links">
+                    <li><a href="#">Правила аренды</a></li>
+                    <li><a href="#">FAQ</a></li>
+                    <li><a href="#">Безопасность</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h3>Контакты</h3>
+                <ul class="footer-links">
+                    <li><a href="tel:+79178830127">8 (917) 883 01 27</a></li>
+                    <li><a href="mailto:scootify@example.com">scootify@example.com</a></li>
+                    <li>Казань, ул. Баумана, 25</li>
+                </ul>
+            </div>
+        </div>
+        <div class="copyright">
+            <p>© 2025 Scootify. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
