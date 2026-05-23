@@ -5,6 +5,18 @@
 {% block content %}
 <section class="hero">
     <div class="hero-container">
+        <!-- ========== ПРИВЕТСТВИЕ ДЛЯ АВТОРИЗОВАННОГО ПОЛЬЗОВАТЕЛЯ (ЛР 15-16) ========== -->
+        {% if session.username %}
+        <div style="background: rgba(0, 102, 204, 0.3); backdrop-filter: blur(10px); padding: 20px 30px; border-radius: 20px; margin-bottom: 40px; text-align: center;">
+            <h2 style="color: white; margin: 0;">✨ Добро пожаловать, {{ session.username }}! ✨</h2>
+            <p style="color: rgba(255,255,255,0.9); margin-top: 10px;">Рады снова видеть вас в Scootify!</p>
+        </div>
+        {% else %}
+        <div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 20px 30px; border-radius: 20px; margin-bottom: 40px; text-align: center;">
+            <p style="color: white; margin: 0;">👋 <a href="/login" style="color: #66CCFF;">Войдите</a>, чтобы получить доступ ко всем возможностям!</p>
+        </div>
+        {% endif %}
+
         <div class="hero-content">
             <h1>Прокат самокатов <span>в Казани</span></h1>
             <p>Быстро, удобно и экологично. Начните свою поездку прямо сейчас!</p>

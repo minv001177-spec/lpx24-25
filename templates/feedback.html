@@ -5,6 +5,14 @@
     <div class="hero-container">
         <div style="max-width: 550px; margin: 0 auto; background: white; padding: 40px; border-radius: 24px; box-shadow: 0 20px 40px rgba(0,0,0,0.15);">
             
+            {% if session.feedback_sent %}
+            <div style="text-align: center;">
+                <div style="font-size: 60px; margin-bottom: 20px;">✅</div>
+                <h2 style="color: #27ae60; margin-bottom: 15px;">Спасибо за ваше сообщение!</h2>
+                <p style="color: #666; margin-bottom: 25px;">Мы ответим вам в ближайшее время.</p>
+                <a href="/" class="btn-submit" style="display: inline-block; text-decoration: none;">← Вернуться на главную</a>
+            </div>
+            {% else %}
             <div style="text-align: center; margin-bottom: 30px;">
                 <i class="fas fa-envelope" style="font-size: 50px; color: #0066CC; margin-bottom: 15px;"></i>
                 <h2 style="color: #0066CC; margin-bottom: 10px;">✉️ Обратная связь</h2>
@@ -29,6 +37,7 @@
                 
                 <button type="submit" class="btn-submit">📨 Отправить сообщение</button>
             </form>
+            {% endif %}
         </div>
     </div>
 </section>
@@ -71,6 +80,7 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s;
+    text-align: center;
 }
 .btn-submit:hover {
     transform: translateY(-2px);

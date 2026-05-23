@@ -8,38 +8,127 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <style>
-        /* Глобальные стили для прижатия подвала */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        html, body {
-            height: 100%;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body { height: 100%; }
         body {
             display: flex;
             flex-direction: column;
             min-height: 100vh;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: var(--gradient-dark);
+            background: linear-gradient(135deg, #001F3F 0%, #003366 100%);
             line-height: 1.6;
         }
-        
-        main {
-            flex: 1 0 auto;
-        }
-        
+        main { flex: 1 0 auto; }
         .footer {
             flex-shrink: 0;
-            margin-top: 0;
             background: rgba(0, 0, 0, 0.85);
             color: white;
             padding: 60px 24px 40px;
         }
-        
+        /* Стили для хедера - все в одну строку */
+        .header-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 80px;
+            gap: 20px;
+            flex-wrap: nowrap;
+        }
+        .nav-menu {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            flex-wrap: nowrap;
+        }
+        .nav-menu li {
+            white-space: nowrap;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: #1E293B;
+            font-weight: 500;
+            transition: color 0.3s;
+            font-size: 14px;
+        }
+        .header-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: nowrap;
+        }
+        .btn {
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #0066CC, #00B3B3);
+            color: white;
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #0066CC;
+            border: 2px solid rgba(0, 102, 204, 0.2);
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #0066CC, #00B3B3);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+        }
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0066CC, #00B3B3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .user-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 102, 204, 0.1);
+            padding: 6px 14px;
+            border-radius: 50px;
+            color: #0066CC;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+        @media (max-width: 1100px) {
+            .nav-menu { gap: 15px; }
+            .nav-menu a { font-size: 13px; }
+            .btn { padding: 6px 16px; font-size: 13px; }
+        }
+        @media (max-width: 900px) {
+            .header-container { flex-wrap: wrap; height: auto; padding: 15px; }
+            .nav-menu { flex-wrap: wrap; justify-content: center; }
+        }
         .flash-messages {
             position: fixed;
             top: 90px;
@@ -63,22 +152,18 @@
         .flash-error { background: #e74c3c; color: white; }
         .flash-info { background: #3498db; color: white; }
         .flash-warning { background: #f39c12; color: white; }
-        
-        /* Стили для страницы восстановления пароля */
         .forgot-password-container {
             max-width: 500px;
             margin: 120px auto 60px;
             padding: 0 20px;
             width: 100%;
         }
-        
         .forgot-password-card {
             background: white;
             padding: 40px;
             border-radius: 24px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
-        
         .form-group {
             margin-bottom: 20px;
         }
@@ -135,10 +220,11 @@
                 <li><a href="/#map-section">Карта</a></li>
                 <li><a href="/#how-it-works">Как работает</a></li>
                 <li><a href="/#footer">Контакты</a></li>
-                <li><a href="/feedback">📝 Отзывы</a></li>
+                <li><a href="/feedback">Обратная связь</a></li>
+                <li><a href="/guestbook">Гостевая книга</a></li>
                 {% if session.user_id %}
-                <li><a href="/secret">🔐 Секрет</a></li>
-                <li><a href="/profile">👤 Профиль</a></li>
+                <li><a href="/secret">Секрет</a></li>
+                <li><a href="/profile">Профиль</a></li>
                 {% endif %}
             </ul>
             
@@ -209,6 +295,9 @@
             </div>
         </div>
         <div class="copyright">
+            {% if session.visit_count %}
+            <p>👁️ Вы посетили сайт {{ session.visit_count }} раз(а)</p>
+            {% endif %}
             <p>© 2025 Scootify. Все права защищены.</p>
         </div>
     </footer>

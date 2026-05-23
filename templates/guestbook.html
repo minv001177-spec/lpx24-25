@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Гостевая книга - Scootify{% endblock %}
+
+{% block content %}
+<section class="hero" style="min-height: auto; padding: 100px 24px;">
+    <div class="hero-container">
+        <div style="max-width: 800px; margin: 0 auto;">
+            <div style="background: white; border-radius: 24px; padding: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <i class="fas fa-book" style="font-size: 50px; color: #0066CC;"></i>
+                    <h2 style="color: #0066CC; margin-top: 15px;">📖 Гостевая книга</h2>
+                    <p style="color: #666;">Оставьте свой отзыв о нашем сервисе!</p>
+                </div>
+                
+                <form method="POST" action="/guestbook" style="margin-bottom: 40px; padding-bottom: 30px; border-bottom: 2px solid #f0f0f0;">
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Ваше имя:</label>
+                        <input type="text" name="name" value="{{ session.username or 'Гость' }}" required>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-comment"></i> Комментарий:</label>
+                        <textarea name="comment" rows="3" required placeholder="Поделитесь впечатлениями о Scootify..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">💬 Оставить запись</button>
+                </form>
+                
+                <h3 style="margin-bottom: 20px;">📝 Последние записи ({{ session.guestbook_comments|length if session.guestbook_comments else 0 }})</h3>
+                
+                {% if session.guestbook_comments and session.guestbook_comments|length > 0 %}
+                    {% for comment in session.guestbook_comments|reverse %}
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 16px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <strong style="color: #0066CC;">
+                                <i class="fas fa-user-circle"></i> {{ comment.name }}
+                            </strong>
+                            <small style="color: #999;">{{ comment.date }}</small>
+                        </div>
+                        <p style="color: #333; margin: 10px 0;">{{ comment.text }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="text-align: center; padding: 40px; background: #f8f9fa; border-radius: 16px;">
+                        <p style="color: #999;">Пока нет ни одной записи. Будьте первым!</p>
+                    </div>
+                {% endif %}
+                
+                {% if session.guestbook_comments and session.guestbook_comments|length > 0 %}
+                <form method="POST" action="/guestbook/clear" style="margin-top: 20px;">
+                    <button type="submit" style="background: #e74c3c; color: white; padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-size: 14px;">
+                        🗑️ Очистить гостевую книгу
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #1E293B;
+}
+.form-group label i {
+    margin-right: 8px;
+    color: #0066CC;
+}
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 15px;
+    font-family: inherit;
+}
+.form-group input:focus, .form-group textarea:focus {
+    outline: none;
+    border-color: #0066CC;
+    box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+}
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, #0066CC, #00B3B3);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+}
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(0,102,204,0.3);
+}
+</style>
+{% endblock %}

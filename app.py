@@ -11,6 +11,16 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 
+# ========== СЧЁТЧИК ПОСЕЩЕНИЙ (ЛР 15-16) ==========
+@app.before_request
+def count_visits():
+    # Игнорируем статические файлы
+    if request.endpoint and not request.endpoint.startswith('static'):
+        if 'visit_count' in session:
+            session['visit_count'] = session['visit_count'] + 1
+        else:
+            session['visit_count'] = 1
+
 # ========== МОДЕЛЬ ПОЛЬЗОВАТЕЛЯ ==========
 class User(db.Model):
     __tablename__ = 'users'
@@ -119,7 +129,7 @@ def register():
     
     return render_template('register.html')
 
-# ========== ВХОД ==========
+# ========== ВХОД (ФОРМА ВХОДА ЛР 15-16) ==========
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -139,7 +149,7 @@ def login():
     
     return render_template('login.html')
 
-# ========== ВЫХОД ==========
+# ========== ВЫХОД (ЛР 15-16) ==========
 @app.route('/logout')
 def logout():
     username = session.get('username')
@@ -248,7 +258,7 @@ def reset_password():
     flash('Ошибка при сбросе пароля!', 'error')
     return render_template('forgot_password.html')
 
-# ========== ОБРАТНАЯ СВЯЗЬ ==========
+# ========== ОБРАТНАЯ СВЯЗЬ (ЛР 15-16) ==========
 @app.route('/feedback', methods=['GET', 'POST'])
 def feedback():
     if request.method == 'POST':
@@ -258,19 +268,53 @@ def feedback():
         
         if message:
             with open('feedback.txt', 'a', encoding='utf-8') as f:
-                from datetime import datetime
                 f.write(f"=== {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} ===\n")
                 f.write(f"Имя: {name or session.get('username', 'Аноним')}\n")
                 f.write(f"Email: {email}\n")
                 f.write(f"Сообщение: {message}\n")
                 f.write("-" * 50 + "\n\n")
             
+            session['feedback_sent'] = True
             flash('Спасибо за ваш отзыв!', 'success')
-            return redirect(url_for('index'))
+            return redirect(url_for('feedback'))
         else:
             flash('Пожалуйста, напишите текст сообщения', 'error')
     
+    if request.method == 'GET' and 'feedback_sent' in session:
+        session.pop('feedback_sent', None)
+    
     return render_template('feedback.html')
+
+# ========== ГОСТЕВАЯ КНИГА (Задание 5 - Вариант А) ==========
+@app.route('/guestbook', methods=['GET', 'POST'])
+def guestbook():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        comment = request.form.get('comment')
+        
+        if comment:
+            comments = session.get('guestbook_comments', [])
+            comments.append({
+                'name': name or 'Аноним',
+                'text': comment,
+                'date': datetime.now().strftime('%d.%m.%Y %H:%M')
+            })
+            if len(comments) > 20:
+                comments = comments[-20:]
+            session['guestbook_comments'] = comments
+            flash('Ваш комментарий добавлен!', 'success')
+        else:
+            flash('Пожалуйста, напишите комментарий', 'error')
+        
+        return redirect(url_for('guestbook'))
+    
+    return render_template('guestbook.html')
+
+@app.route('/guestbook/clear', methods=['POST'])
+def guestbook_clear():
+    session.pop('guestbook_comments', None)
+    flash('Гостевая книга очищена', 'info')
+    return redirect(url_for('guestbook'))
 
 # ========== СОЗДАНИЕ БАЗЫ ДАННЫХ ==========
 with app.app_context():
